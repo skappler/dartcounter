@@ -121,7 +121,8 @@ def main():
 	screen.refresh()
 	clearLine(height-2)
 	clearLine(height-3)
-	screen.addstr(height-1,0,winner+" has won! Press any key to exit.")
+	winavg = sum(playerScores[winner]) / len(playerScores[winner])
+	screen.addstr(height-1,0,winner+" has won with an average of %.2f! Press any key to exit." % winavg)
 	screen.getkey()
 	endCurses()
 	
