@@ -74,9 +74,19 @@ def main():
 	for n in sys.argv[1:]:
 		players.append(n)
 		
+	
+	checkouts = dict()
+	with open("checkout.csv","r") as f:
+		lines=f.readlines()
+		for line in lines:
+			spl = line.split(",")
+			checkouts[int(spl[0])] = list()
+			for e in spl[1:]:
+				checkouts[int(spl[0])].append(e)
+	
 	initCurses()
 	initPoints = askForNumber("How many points?")
-	
+
 	playerScores = {p: list() for p in players}
 	
 	displayBoard(players,playerScores,initPoints)
@@ -85,12 +95,21 @@ def main():
 	winner = ""
 	while not finished:
 		for player in players:
+			points = initPoints - sum(playerScores[player])
+			clearLine(height-3) 
+			if points in checkouts.keys():
+				note = "Possible checkout for "+player+":"
+				screen.addstr(height-3,0,note)
+				index = len(note)+1
+				for e in checkouts[points]:
+					screen.addstr(height-3,index,e)
+					index = index + len(e) + 1
 			score = askForNumber("Score for "+player+":")
-			newPoints = initPoints - sum(playerScores[player]) - score
+			newPoints = points - score
 			
 			if newPoints > 1:
 				playerScores[player].append(score)
-			elif newPoints < 0 || newPoints == 1:
+			elif newPoints < 0 or newPoints == 1:
 				playerScores[player].append(0)
 			elif newPoints  == 0:
 				finished = True
@@ -101,6 +120,7 @@ def main():
 	
 	screen.refresh()
 	clearLine(height-2)
+	clearLine(height-3)
 	screen.addstr(height-1,0,winner+" has won! Press any key to exit.")
 	screen.getkey()
 	endCurses()
